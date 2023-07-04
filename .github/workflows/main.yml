@@ -1,29 +1,30 @@
----
+# Workflow name and trigger event configuration
 name: compute instances list using Workload Identity Federation
 on:
   push:
     branches:
       - main
+
+# Define the job
 jobs:
   gcloud-setup:
     runs-on: ubuntu-latest
-    # Add "id-token" with the intended permissions.
+    # Define permissions for the job
     permissions:
       contents: 'read'
       id-token: 'write'
 
     steps:
-    - uses: 'actions/checkout@v3'
+    - uses: 'actions/checkout@v3'  # Checkout the repository
 
-    # Configure Workload Identity Federation via a credentials file.
     - id: 'auth'
-      name: 'Authenticate to Google Cloud'
+      name: 'Authenticate to Google Cloud'  # Authenticate to Google Cloud using Workload Identity Federation
       uses: 'google-github-actions/auth@v1'
       with:
         token_format: 'access_token'
-        workload_identity_provider: ${{ secrets.POOL_URL }}
-        service_account: ${{ secrets.SERVICE_ACCOUNT }}
-        
-    - name: 'List Compute Instances'
-      run: |-
-        gcloud compute instances list --project '${{ secrets.PROJECT_ID }}' --zones us-central1-a
+        workload_identity_provider: ${{ secrets.POOL_URL }}  # Workload Identity Provider URL
+        service_account: ${{ secrets.SERVICE_ACCOUNT }}  # Service account to be used
+
+    - name: 'List Compute Instances'  # Run the command to list compute instances
+      run: |-  # Use the "run" keyword to execute the command
+        gcloud compute instances list --project '${{ secrets.PROJECT_ID }}' --zones us-central1-a  # Command to list compute instances
