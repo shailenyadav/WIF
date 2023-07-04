@@ -1,0 +1,29 @@
+---
+name: compute instances list using Workload Identity Federation
+on:
+  push:
+    branches:
+      - main
+jobs:
+  gcloud-setup:
+    runs-on: ubuntu-latest
+    # Add "id-token" with the intended permissions.
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+    - uses: 'actions/checkout@v3'
+
+    # Configure Workload Identity Federation via a credentials file.
+    - id: 'auth'
+      name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v1'
+      with:
+        token_format: 'access_token'
+        workload_identity_provider: ${{ secrets.POOL_URL }}
+        service_account: ${{ secrets.SERVICE_ACCOUNT }}
+        
+    - name: 'List Compute Instances'
+      run: |-
+        gcloud compute instances list --project '${{ secrets.PROJECT_ID }}' --zones us-central1-a
